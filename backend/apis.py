@@ -31,3 +31,46 @@ def pegar_planilhao(data_base):
     except Exception as e:
         logger.error(f"ERRO TECNICO: {e}")
         print(f"ERRO TECNICO: {e}")
+
+
+def get_preco_corrigido(data_ini, data_fim, ticker):
+
+    params = {
+            'ticker': ticker,
+            'data_ini': data_ini,
+            'data_fim': data_fim
+            }
+    try:
+        r = requests.get('https://laboratoriodefinancas.com/api/v1/preco-corrigido',params=params, headers=headers)
+        if r.status_code == 200:
+            dados = r.json()
+            logger.info(f"Dados do Preco Corrigido consultados com sucesso: {ticker}")
+            print(f"Dados do Preco Corrigido consultados com sucesso: {ticker}")
+            return dados
+        else:
+            logger.error(f"Erro na consulta do Preco Corrigido: {ticker}")
+            print(f"Erro na consulta do Preco Corrigido: {ticker}")
+    except Exception as e:
+        logger.error(f"ERRO TECNICO: {e}")
+        print(f"ERRO TECNICO: {e}")
+
+def get_preco_diversos(data_ini, data_fim, ticker):
+
+    params = {
+            'ticker': ticker,
+            'data_ini': data_ini,
+            'data_fim': data_fim
+            }
+    try:
+        r = requests.get('https://laboratoriodefinancas.com/api/v1/preco-diversos',params=params, headers=headers)
+        if r.status_code == 200:
+            dados = r.json()
+            logger.info(f"Dados do Preco diversos consultados com sucesso: {ticker}")
+            print(f"Dados do Preco diversos consultados com sucesso: {ticker}")
+            return dados
+        else:
+            logger.error(f"Erro na consulta do Preco diversos: {ticker}")
+            print(f"Erro na consulta do Preco diversos: {ticker}")
+    except Exception as e:
+        logger.error(f"ERRO TECNICO: {e}")
+        print(f"ERRO TECNICO: {e}")

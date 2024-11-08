@@ -2,7 +2,7 @@ import pandas as pd
 from datetime import date
 import logging
 logger = logging.getLogger(__name__)
-from backend.apis import (pegar_planilhao)
+from backend.apis import (get_preco_diversos, pegar_planilhao, get_preco_corrigido)
 
 def filtrar_duplicado(df:pd.DataFrame, meio:str = None) -> pd.DataFrame:
     """
@@ -57,7 +57,7 @@ def gerar_estrategia(data_base, ind_rentabilidade, ind_desconto, qtde_acoes):
     # qtde_acoes = 15
     # print(data_base, ind_rentabilidade, ind_desconto, qtde_acoes)
     df = pegar_df_planilhao(data_base)
-    df = df[["ticker", ind_rentabilidade, ind_desconto]]
+    df = df[["ticker", ind_rentabilidade, ind_desconto]]    
     df["rank_rent"] = df[ind_rentabilidade].rank()
     df["rank_desc"] = df[ind_desconto].rank()
     df["rank_final"] = df["rank_rent"] + df["rank_desc"]
@@ -82,7 +82,7 @@ def pegar_df_preco_corrigido(data_ini:date, data_fim:date, carteira:list) -> pd.
     for ticker in carteira:
         dados = get_preco_corrigido(data_ini, data_fim, ticker)
         if dados:
-            dados = dados.json()['dados']
+            dados = dados['dados']
             df_temp = pd.DataFrame.from_dict(dados)
             df_preco = pd.concat([df_preco, df_temp], axis=0, ignore_index=True)
             logger.info(f'{ticker} finalizado!')
@@ -109,7 +109,7 @@ def pegar_df_preco_diversos(data_ini:date, data_fim:date, carteira:list) -> pd.D
     for ticker in carteira:
         dados = get_preco_diversos(data_ini, data_fim, ticker)
         if dados:
-            dados = dados.json()['dados']
+            dados = dados['dados']
             df_temp = pd.DataFrame.from_dict(dados)
             df_preco = pd.concat([df_preco, df_temp], axis=0, ignore_index=True)
             logger.info(f'{ticker} finalizado!')
@@ -118,3 +118,20 @@ def pegar_df_preco_diversos(data_ini:date, data_fim:date, carteira:list) -> pd.D
             logger.error(f"Sem Preco Corrigido: {ticker}")
             print(f"Sem Preco Corrigido: {ticker}")
     return df_preco
+
+
+def gerar_grafico(data_ini, data_fim,carteira):
+    # carteira = ["PETR4", "VALE3", "BBAS3"]
+    # data_ini=date(2000,1,1)
+    # data_fim=date(2024,11,1)
+    df_preco = pegar_df_preco_corrigido(data_ini, data_fim, carteira)
+    df_grafico = df_preco.groupby("data")["fechamento"].sum()
+
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    df_grafico.index
+    df_grafico.values
+    sns.lineplot(df_grafico)
+    plt.figure()
+
+    plt.plot(df_grafico)
